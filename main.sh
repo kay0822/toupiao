@@ -11,29 +11,34 @@ while true; do
     fi
 done
 
-echo account: ${account}, init_count: ${init_count}
+echo $(date) account: ${account}, init_count: ${init_count}
 
 nonce=${init_count}
 
-while read to
+while read to_address
 do
-   if echo "${to}" | grep "^0x" > /dev/null ;then
-      echo ${to}
+   if echo "${to_address}" | grep "^0x" > /dev/null ;then
+       echo $(date) handling to_address: ${to_address}
+       sleep 1
 
-      raw=$(./gen_raw.js ${privkey} ${nonce} ${to})
-      txid=$(./send_raw.py ${raw})
+       while true; do
+           count=$(./get_count.py ${account})
+           if [ ${nonce} -eq ${count} ];then
+               break
+           else
+               echo $(date) [warn] "nonce(${nonce}) != count(${count}), sleep then retry"
+               sleep 3
+           fi
+       done
 
-      (( nonce += 1 ))
+       raw=$(./gen_raw.js ${privkey} ${nonce} ${to_address})
+       txid=$(./send_raw.py ${raw})
+       echo $(date) sent, to_address: ${to_address}, txid: ${txid}
 
-      while true; do
-          count=$(./get_count.py ${account})
-          if [ ${nonce} -eq ${count} ];then
-              break
-          else
-              sleep 3
-          fi
+       (( nonce += 1 ))
+
    else
-      echo 'invalid to: ${to}
+      echo $(date) invalid to_address: ${to_address}, break
       break
    fi
 done  < ${file}
