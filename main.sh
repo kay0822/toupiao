@@ -33,6 +33,7 @@ do
 
        raw=$(./gen_raw.js ${privkey} ${nonce} ${to_address})
        txid=$(./send_raw.py ${raw})
+
        echo $(date) sent, to_address: ${to_address}, txid: ${txid}
 
        (( nonce += 1 ))
