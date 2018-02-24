@@ -14,6 +14,7 @@ done
 echo $(date) account: ${account}, init_count: ${init_count}
 
 nonce=${init_count}
+tx_count=1
 
 while read to_address
 do
@@ -34,9 +35,10 @@ do
        raw=$(./gen_raw.js ${privkey} ${nonce} ${to_address})
        txid=$(./send_raw.py ${raw})
 
-       echo $(date) sent, to_address: ${to_address}, txid: ${txid}
+       echo $(date) sent, to_address: ${to_address}, txid: ${txid}, tx_count: ${tx_count}
 
        (( nonce += 1 ))
+       (( tx_count += 1 ))
 
    else
       echo $(date) invalid to_address: ${to_address}, break
